@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model, authenticate
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 # from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializer import (
@@ -30,6 +32,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return UserSerializer
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    @method_decorator(csrf_exempt)
     def register(self, request):
         """Register a new user"""
         serializer = self.get_serializer(data=request.data)
