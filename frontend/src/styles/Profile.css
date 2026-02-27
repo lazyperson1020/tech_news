@@ -118,6 +118,71 @@
   color: #c33;
 }
 
+/* Preferences Section */
+.preferences-section {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.preferences-section h2 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.preferences-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preference-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+  transition: transform 0.2s;
+}
+
+.preference-item:hover {
+  transform: translateX(4px);
+}
+
+.pref-rank {
+  font-weight: 700;
+  color: #667eea;
+  min-width: 25px;
+}
+
+.pref-category {
+  flex: 1;
+  color: #333;
+  font-weight: 500;
+}
+
+.pref-score {
+  color: #666;
+  font-size: 13px;
+  background: #f0f0f0;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.loading-text,
+.no-prefs-text {
+  color: #999;
+  font-size: 14px;
+  padding: 15px;
+  text-align: center;
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .profile {
     padding: 20px;
@@ -137,5 +202,14 @@
   .cancel-btn,
   .logout-btn {
     width: 100%;
+  }
+
+  .preference-item {
+    flex-wrap: wrap;
+  }
+
+  .pref-score {
+    flex-basis: 100%;
+    margin-top: 8px;
   }
 }

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Article, Bookmark, UserPreference, ChatMessage
+from .models import UserProfile, Article, Bookmark, UserPreference, ChatMessage, ArticleLike, SearchQuery
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,19 +51,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.username', read_only=True)
     is_bookmarked = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
         fields = ['id', 'title', 'content', 'summary', 'author', 'author_name', 
                   'source', 'source_url', 'image_url', 'category', 'is_approved', 
-                  'views', 'published_at', 'updated_at', 'is_bookmarked']
-        read_only_fields = ['id', 'views', 'published_at', 'updated_at', 'author']
+                  'views', 'likes_count', 'published_at', 'updated_at', 'is_bookmarked']
+        read_only_fields = ['id', 'views', 'likes_count', 'published_at', 'updated_at', 'author']
     
     def get_is_bookmarked(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return Bookmark.objects.filter(user=request.user, article=obj).exists()
         return False
+
+    def get_likes_count(self, obj):
+        return obj.likes_count
 
 class BookmarkSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True)
@@ -82,8 +86,23 @@ class BookmarkSerializer(serializers.ModelSerializer):
 class UserPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPreference
+        # `categories` is a mapping of category_key -> score (JSON/dict)
         fields = ['id', 'categories', 'notification_enabled', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class ArticleLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticleLike
+        fields = ['id', 'user', 'article', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class SearchQuerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SearchQuery
+        fields = ['id', 'user', 'query', 'count', 'last_searched']
+        read_only_fields = ['id', 'count', 'last_searched']
 
 class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:

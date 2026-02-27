@@ -10,6 +10,7 @@ function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [summarizing, setSummarizing] = useState(false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -22,6 +23,7 @@ function ArticleDetail() {
       const response = await articlesAPI.getOne(id);
       setArticle(response.data);
       setIsBookmarked(response.data.is_bookmarked);
+      setLikesCount(response.data.likes_count || 0);
     } catch (error) {
       console.error('Failed to load article', error);
     } finally {
@@ -44,6 +46,20 @@ function ArticleDetail() {
       setIsBookmarked(!isBookmarked);
     } catch (error) {
       console.error('Bookmark action failed', error);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await articlesAPI.like(id);
+      setLikesCount(response.data.likes_count);
+    } catch (error) {
+      console.error('Like action failed', error);
     }
   };
 
@@ -90,6 +106,13 @@ function ArticleDetail() {
           <div className="article-actions">
             {isAuthenticated && (
               <>
+                <button
+                  onClick={handleLike}
+                  className="like-btn"
+                  title="Like this article"
+                >
+                  ❤️ {likesCount}
+                </button>
                 <button
                   onClick={handleBookmark}
                   className={`bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}

@@ -5,10 +5,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db.models import Count, Q
-from .models import Article, UserProfile, Bookmark, UserPreference, ChatMessage
+from .models import Article, UserProfile, Bookmark, UserPreference, ChatMessage, ArticleLike, SearchQuery
 from .serializers import (ArticleSerializer, UserProfileSerializer, 
                           BookmarkSerializer, RegisterSerializer, UserPreferenceSerializer,
-                          ChatMessageSerializer)
+                          ChatMessageSerializer, ArticleLikeSerializer, SearchQuerySerializer)
 from .services import NewsService, AIService
 
 @api_view(['POST'])
@@ -76,6 +76,22 @@ class ArticleViewSet(viewsets.ModelViewSet):
             )
         
         return queryset
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def record_search(self, request):
+        """Record a user's search query to update preferences."""
+        query = request.data.get('query', '').strip()
+        if not query:
+            return Response({'error': 'Query is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sq, created = SearchQuery.objects.get_or_create(user=request.user, query=query)
+        if not created:
+            # Update existing search: increment count
+            sq.count = sq.count + 1
+            sq.save(update_fields=['count', 'last_searched'])
+
+        serializer = SearchQuerySerializer(sq)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -83,6 +99,27 @@ class ArticleViewSet(viewsets.ModelViewSet):
         instance.save(update_fields=['views'])
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        """POST to like an article, DELETE to unlike."""
+        article = self.get_object()
+        user = request.user
+        if request.method == 'POST':
+            # create like
+            try:
+                ArticleLike.objects.create(user=user, article=article)
+                return Response({'message': 'Liked', 'likes_count': article.likes_count}, status=status.HTTP_201_CREATED)
+            except Exception:
+                return Response({'message': 'Already liked or error', 'likes_count': article.likes_count}, status=status.HTTP_200_OK)
+
+        # DELETE -> remove like
+        try:
+            like = ArticleLike.objects.get(user=user, article=article)
+            like.delete()
+            return Response({'message': 'Unliked', 'likes_count': article.likes_count}, status=status.HTTP_200_OK)
+        except ArticleLike.DoesNotExist:
+            return Response({'error': 'Not liked', 'likes_count': article.likes_count}, status=status.HTTP_404_NOT_FOUND)
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -182,6 +219,39 @@ class UserPreferenceViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def top_preferences(self, request):
+        """Get user's top 5 preferred categories ranked by score."""
+        preference = request.user.preferences
+        
+        # Handle both dict (new) and list (legacy) formats
+        if isinstance(preference.categories, list):
+            preference.categories = {}
+            preference.save(update_fields=['categories'])
+        
+        # Sort categories by score (descending)
+        sorted_prefs = sorted(
+            preference.categories.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:5]  # Top 5
+        
+        # Format response with category label and score
+        category_labels = dict(Article.CATEGORY_CHOICES)
+        top_prefs = [
+            {
+                'category_key': key,
+                'category_label': category_labels.get(key, key),
+                'score': score
+            }
+            for key, score in sorted_prefs
+        ]
+        
+        return Response({
+            'total_categories': len(preference.categories),
+            'top_preferences': top_prefs
+        })
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])

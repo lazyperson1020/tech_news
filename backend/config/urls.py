@@ -10,7 +10,7 @@ router = DefaultRouter()
 router.register(r'articles', views.ArticleViewSet, basename='article')
 router.register(r'bookmarks', views.BookmarkViewSet, basename='bookmark')
 router.register(r'profiles', views.UserProfileViewSet, basename='profile')
-router.register(r'preferences', views.UserPreferenceViewSet, basename='preference')
+router.register(r'userpreferences', views.UserPreferenceViewSet, basename='userpreference')
 router.register(r'chat', views.ChatViewSet, basename='chat')
 
 urlpatterns = [

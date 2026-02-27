@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import { preferencesAPI } from '../services/api';
 import '../styles/Profile.css';
 
 function Profile() {
   const { profile, updateProfile, logout } = useAuthStore();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
+  const [topPreferences, setTopPreferences] = useState([]);
+  const [loadingPrefs, setLoadingPrefs] = useState(false);
   const [formData, setFormData] = useState({
     bio: '',
     h_index: 0,
@@ -22,8 +25,22 @@ function Profile() {
         credentials: profile.credentials || '',
         experience: profile.experience || '',
       });
+      fetchTopPreferences();
     }
   }, [profile]);
+
+  const fetchTopPreferences = async () => {
+    try {
+      setLoadingPrefs(true);
+      const response = await preferencesAPI.getTopPreferences();
+      setTopPreferences(response.data.top_preferences);
+    } catch (error) {
+      console.error('Error fetching preferences:', error);
+      setTopPreferences([]);
+    } finally {
+      setLoadingPrefs(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,6 +138,28 @@ function Profile() {
             <p><strong>Credentials:</strong> {profile.credentials || 'None'}</p>
             <p><strong>Experience:</strong> {profile.experience || 'None'}</p>
             <p><strong>Author:</strong> {profile.is_author ? 'Yes' : 'No'}</p>
+          </div>
+
+          {/* Top Preferences Section */}
+          <div className="preferences-section">
+            <h2>Your Top Reading Preferences</h2>
+            {loadingPrefs ? (
+              <p className="loading-text">Loading preferences...</p>
+            ) : topPreferences.length > 0 ? (
+              <div className="preferences-list">
+                {topPreferences.map((pref, index) => (
+                  <div key={index} className="preference-item">
+                    <span className="pref-rank">{index + 1}.</span>
+                    <span className="pref-category">{pref.category_label}</span>
+                    <span className="pref-score">{pref.score} points</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="no-prefs-text">
+                Start searching and liking articles to build your preferences!
+              </p>
+            )}
           </div>
 
           <div className="profile-actions">

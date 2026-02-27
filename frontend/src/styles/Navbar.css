@@ -1,7 +1,7 @@
 .navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   padding: 1rem 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   color: white;
   position: fixed;
   top: 0;
@@ -9,6 +9,7 @@
   right: 0;
   z-index: 1000;
   width: 100%;
+  border-bottom: 1px solid #334155;
 }
 
 .nav-container {

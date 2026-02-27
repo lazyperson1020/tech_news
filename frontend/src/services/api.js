@@ -59,6 +59,7 @@ export const articlesAPI = {
   create: (data) => api.post('/articles/', data),
   update: (id, data) => api.patch(`/articles/${id}/`, data),
   delete: (id) => api.delete(`/articles/${id}/`),
+  like: (id) => api.post(`/articles/${id}/like/`),
   summarize: (id) => api.post(`/articles/${id}/summarize/`),
   fetchNews: (category) => api.post('/articles/fetch_news/', {}, { params: { category } }),
   trending: () => api.get('/articles/trending/'),
@@ -76,8 +77,9 @@ export const profileAPI = {
 };
 
 export const preferencesAPI = {
-  getMe: () => api.get('/preferences/me/'),
-  updateMe: (data) => api.put('/preferences/me/', data),
+  getMe: () => api.get('/userpreferences/me/'),
+  updateMe: (data) => api.put('/userpreferences/me/', data),
+  getTopPreferences: () => api.get('/userpreferences/top_preferences/'),
 };
 
 export const analyticsAPI = {
