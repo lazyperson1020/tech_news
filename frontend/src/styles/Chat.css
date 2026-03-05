@@ -1,7 +1,7 @@
 .chat-wrapper {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px);
+  height: 100%;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   border-radius: 8px;
   overflow: hidden;
@@ -257,7 +257,7 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .chat-wrapper {
-    height: calc(100vh - 60px);
+    height: 100%;
   }
 
   .chat-header {

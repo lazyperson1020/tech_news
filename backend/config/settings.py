@@ -139,4 +139,4 @@ CORS_ALLOWED_ORIGINS = [
 # External API Keys
 NEWS_API_KEY = config('NEWS_API_KEY', default='')
 TAVILY_API_KEY = config('TAVILY_API_KEY', default='')
-OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+GROQ_API_KEY = config('GROQ_API_KEY', default='')

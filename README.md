@@ -22,3 +22,31 @@ Welcome to the Tech News project! This repository is designed to help you stay u
 - **Database**: SQLite (development) / PostgreSQL (production)
 - **AI**: OpenAI API for summarization
 
+
+## Tests & Linting
+
+Backend test and lint commands (run from the project root):
+
+ - Install backend dev dependencies:
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+ - Run tests with coverage:
+
+```bash
+cd backend
+pytest
+```
+
+ - Run flake8 linting:
+
+```bash
+cd backend
+flake8 .
+```
+
+The repository includes `backend/pytest.ini`, `backend/.coveragerc`, and `backend/.flake8` for default pytest/coverage/flake8 behavior.
+

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { articlesAPI, bookmarksAPI } from '../services/api';
 import useAuthStore from '../store/authStore';
+import Chat from './Chat';
 import '../styles/ArticleDetail.css';
 
 function ArticleDetail() {
@@ -84,16 +85,17 @@ function ArticleDetail() {
   }
 
   return (
-    <div className="article-detail">
-      <button onClick={() => navigate('/')} className="back-btn">
-        ← Back to Articles
-      </button>
+    <div className="article-detail-container">
+      <div className="article-detail">
+        <button onClick={() => navigate('/')} className="back-btn">
+          ← Back to Articles
+        </button>
 
-      {article.image_url && (
-        <img src={article.image_url} alt={article.title} className="article-hero-image" />
-      )}
+        {article.image_url && (
+          <img src={article.image_url} alt={article.title} className="article-hero-image" />
+        )}
 
-      <article className="article-body">
+        <article className="article-body">
         <h1>{article.title}</h1>
 
         <div className="article-header">
@@ -152,6 +154,10 @@ function ArticleDetail() {
           </a>
         )}
       </article>
+      </div>
+      <div className="chat-panel">
+        <Chat />
+      </div>
     </div>
   );
 }

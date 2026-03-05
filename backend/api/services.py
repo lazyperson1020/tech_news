@@ -1,6 +1,6 @@
 import requests
+from groq import Groq
 from django.conf import settings
-from openai import OpenAI
 
 class NewsService:
     def __init__(self):
@@ -109,16 +109,22 @@ class NewsService:
 
 class AIService:
     def __init__(self):
-        self.api_key = settings.OPENAI_API_KEY
-        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
+        self.api_key = settings.GROQ_API_KEY
+        if self.api_key:
+            try:
+                self.client = Groq(api_key=self.api_key)
+            except Exception as e:
+                print(f"Groq client init error: {e}")
+                self.client = None
+        else:
+            self.client = None
     
     def summarize_article(self, content, max_words=150):
         if not self.client:
-            return None
-        
+            return self._fallback_summary(content, max_words)
         try:
             response = self.client.chat.completions.create(
-                model='gpt-3.5-turbo',
+                model='llama-3.1-8b-instant',
                 messages=[
                     {
                         'role': 'system',
@@ -129,14 +135,25 @@ class AIService:
                         'content': content
                     }
                 ],
-                max_tokens=max_words // 4 + 100,
-                temperature=0.5
+                max_tokens=int(max_words * 1.5)
             )
-            
             return response.choices[0].message.content
         except Exception as e:
-            print(f"OpenAI error: {e}")
-            return None
+            print(f"Groq summarize error: {e}")
+            return self._fallback_summary(content, max_words)
+    
+    def _fallback_summary(self, content, max_words):
+        """Fallback summary when Groq is unavailable"""
+        sentences = content.split('.')
+        summary = ''
+        
+        for sentence in sentences[:3]:
+            if len(summary) + len(sentence) < max_words:
+                summary += sentence.strip() + '. '
+            else:
+                break
+        
+        return (summary.strip() if summary else content[:max_words]) + ('...' if len(content) > max_words else '')
     
     def chat(self, messages):
         """
@@ -144,18 +161,17 @@ class AIService:
         messages: list of dicts with 'role' and 'content' keys
         """
         if not self.client:
-            return None
+            return "AI service is unavailable. Please check your Groq API key."
         
         try:
             response = self.client.chat.completions.create(
-                model='gpt-3.5-turbo',
+                model='llama-3.1-8b-instant',
                 messages=messages,
                 max_tokens=1000,
-                temperature=0.7
+                temperature=0.7,
             )
-            
             return response.choices[0].message.content
         except Exception as e:
-            print(f"OpenAI chat error: {e}")
-            return None
+            print(f"Groq chat error: {e}")
+            return f"Error communicating with Groq: {str(e)[:100]}"
 
