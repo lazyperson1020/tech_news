@@ -47,7 +47,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd frontend
-          npm run test -- --runInBand
+          npm run test 
 
   lint:
     runs-on: ubuntu-latest
