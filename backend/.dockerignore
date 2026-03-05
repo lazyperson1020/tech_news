@@ -1,0 +1,20 @@
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# virtual environments
+venv
+env
+
+# local data
+*.sqlite3
+/media/
+/staticfiles/
+
+# environment
+.env
+
+# git
+.git

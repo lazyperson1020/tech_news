@@ -1,0 +1,12 @@
+# Node modules
+node_modules
+
+# build output
+dist
+build
+
+# environment
+.env
+
+# git
+.git

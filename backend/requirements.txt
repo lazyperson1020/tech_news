@@ -6,6 +6,8 @@ python-decouple==3.8
 requests==2.31.0
 groq==0.4.1
 
+gunicorn==22.1.0
+
 # Testing and linting
 pytest==7.4.2
 pytest-django==4.5.2

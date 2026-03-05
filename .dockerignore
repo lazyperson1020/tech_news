@@ -1,0 +1,22 @@
+# ignore Python cache and env
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+*.env
+*.sqlite3
+
+# ignore Git stuff
+.git
+.gitignore
+
+# Node
+dist/
+build/
+node_modules/
+**/node_modules
+
+# general
+*.log
