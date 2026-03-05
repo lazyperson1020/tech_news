@@ -151,7 +151,7 @@ function Profile() {
                   <div key={index} className="preference-item">
                     <span className="pref-rank">{index + 1}.</span>
                     <span className="pref-category">{pref.category_label}</span>
-                    <span className="pref-score">{pref.score} points</span>
+                    {/* <span className="pref-score">{pref.score} points</span> */}
                   </div>
                 ))}
               </div>

@@ -5,17 +5,17 @@ from django.db import migrations
 
 def convert_list_to_dict(apps, schema_editor):
     """Convert legacy list format to dict format for categories."""
-    UserPreference = apps.get_model('api', 'UserPreference')
+    UserPreference = apps.get_model("api", "UserPreference")
     for pref in UserPreference.objects.all():
         if isinstance(pref.categories, list):
             pref.categories = {}
-            pref.save(update_fields=['categories'])
+            pref.save(update_fields=["categories"])
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0003_articlelike_searchquery_and_more'),
+        ("api", "0003_articlelike_searchquery_and_more"),
     ]
 
     operations = [
